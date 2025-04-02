@@ -1,0 +1,9 @@
+{
+	"name": "TallerETL",
+	"location": "brazilsouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3e69fc9c-de1a-45a5-8561-5e3c191725b2",
+		"tenantId": "e994072b-523e-4bfe-86e2-442c5e10b244"
+	}
+}
