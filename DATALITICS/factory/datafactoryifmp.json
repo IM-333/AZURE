@@ -1,0 +1,9 @@
+{
+	"name": "datafactoryifmp",
+	"location": "brazilsouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "06855d09-8ac6-4854-9083-583e1154e4e3",
+		"tenantId": "e994072b-523e-4bfe-86e2-442c5e10b244"
+	}
+}
