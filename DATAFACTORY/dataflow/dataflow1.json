@@ -1,0 +1,58 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzurePostgreSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "clientes"
+				},
+				{
+					"linkedService": {
+						"referenceName": "BlobStorage_Conn",
+						"type": "LinkedServiceReference"
+					},
+					"name": "ciudades"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          nro_cliente as integer,",
+				"          nombre as string,",
+				"          apellido as string,",
+				"          ciudad as double,",
+				"          edad as integer,",
+				"          fecha_ultima_compra as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> clientes",
+				"source(output(",
+				"          {_col0_} as string,",
+				"          {_col1_} as short,",
+				"          {_col2_} as string,",
+				"          {_col3_} as string,",
+				"          {_col4_} as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: true,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     container: 'icesicontainer',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: false,",
+				"     wildcardPaths:['municipios.csv']) ~> ciudades"
+			]
+		}
+	}
+}
