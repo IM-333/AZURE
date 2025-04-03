@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
-			"url": "https://www.datos.gov.co/resource/gnut-8jsz.json",
+			"url": "https://www.datos.gov.co/resource/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
