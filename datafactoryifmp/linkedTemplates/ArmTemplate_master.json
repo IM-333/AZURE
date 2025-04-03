@@ -17,7 +17,7 @@
 		},
 		"HttpServer1_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://www.datos.gov.co/resource/gnut-8jsz.json"
+			"defaultValue": "https://www.datos.gov.co/resource/"
 		},
 		"containerUri": {
 			"type": "string",

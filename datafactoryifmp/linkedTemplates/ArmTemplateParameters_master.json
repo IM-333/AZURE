@@ -12,7 +12,7 @@
 			"value": "https://storageifmp.dfs.core.windows.net/"
 		},
 		"HttpServer1_properties_typeProperties_url": {
-			"value": "https://www.datos.gov.co/resource/gnut-8jsz.json"
+			"value": "https://www.datos.gov.co/resource/"
 		},
 		"containerUri": {
 			"value": ""
