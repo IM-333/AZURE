@@ -28,8 +28,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
+						"sqlWriterStoredProcedureName": "[dbo].[sp_Create_GERMAN_RISK_2_With_OneHotEncoding]",
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
