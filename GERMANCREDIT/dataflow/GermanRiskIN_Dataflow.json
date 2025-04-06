@@ -1,0 +1,38 @@
+{
+	"name": "GermanRiskIN_Dataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "GermanRisk",
+						"type": "DatasetReference"
+					},
+					"name": "DATAIN"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          existingchecking as string,",
+				"          duration as string,",
+				"          creditamount as string,",
+				"          savings as string,",
+				"          employmentsince as string,",
+				"          status_sex as string,",
+				"          age as string,",
+				"          housing as string,",
+				"          existingcredits as string,",
+				"          job as string,",
+				"          dependents as string,",
+				"          risk as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DATAIN"
+			]
+		}
+	}
+}
