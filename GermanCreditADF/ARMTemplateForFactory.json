@@ -1,0 +1,330 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Nombre de instancia de Data Factory",
+			"defaultValue": "GermanCreditADF"
+		},
+		"AzureSqlDatabase1_password": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"password\"de \"AzureSqlDatabase1\""
+		},
+		"german_credit_data_csv_connectionString": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"connectionString\"de \"german_credit_data_csv\""
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "tallerifmp.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "GermanRiskDB"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "ifmpadm"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "TallerETL",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "GermanRiskIN_Dataflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"DATAIN": {},
+									"Out": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-04-05T19:55:08Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/GermanRiskIN_Dataflow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GermanRisk')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "german_credit_data_csv",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "german_credit_data.csv",
+						"folderPath": "raw",
+						"container": "german-risk-raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "existingchecking",
+						"type": "String"
+					},
+					{
+						"name": "duration",
+						"type": "String"
+					},
+					{
+						"name": "creditamount",
+						"type": "String"
+					},
+					{
+						"name": "savings",
+						"type": "String"
+					},
+					{
+						"name": "employmentsince",
+						"type": "String"
+					},
+					{
+						"name": "status_sex",
+						"type": "String"
+					},
+					{
+						"name": "age",
+						"type": "String"
+					},
+					{
+						"name": "housing",
+						"type": "String"
+					},
+					{
+						"name": "existingcredits",
+						"type": "String"
+					},
+					{
+						"name": "job",
+						"type": "String"
+					},
+					{
+						"name": "dependents",
+						"type": "String"
+					},
+					{
+						"name": "risk",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/german_credit_data_csv')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GermanRiskOut')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "GERMAN_RISK"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AzureSqlDatabase1_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSqlDatabase1_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AzureSqlDatabase1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('AzureSqlDatabase1_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/german_credit_data_csv')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "german_credit_data_csv",
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('german_credit_data_csv_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GermanRiskIN_Dataflow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "GermanRisk",
+								"type": "DatasetReference"
+							},
+							"name": "DATAIN"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "GermanRiskOut",
+								"type": "DatasetReference"
+							},
+							"name": "Out"
+						}
+					],
+					"transformations": [
+						{
+							"name": "statusandrisk"
+						},
+						{
+							"name": "normalized"
+						},
+						{
+							"name": "savings"
+						},
+						{
+							"name": "sex"
+						},
+						{
+							"name": "housing"
+						},
+						{
+							"name": "job"
+						},
+						{
+							"name": "status"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          existingchecking as string,",
+						"          duration as string,",
+						"          creditamount as string,",
+						"          savings as string,",
+						"          employmentsince as string,",
+						"          status_sex as string,",
+						"          age as string,",
+						"          housing as string,",
+						"          existingcredits as string,",
+						"          job as string,",
+						"          dependents as string,",
+						"          risk as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> DATAIN",
+						"DATAIN derive(marital_status = split(status_sex, ':')[1],",
+						"          sex = split(status_sex, ':')[2],",
+						"          risk = iif(\r",
+						"    equals(lower(trim(risk)), \"high risk\"),\r",
+						"    1,\r",
+						"    0\r",
+						")) ~> statusandrisk",
+						"statusandrisk derive(normalized_savings = trim(lower(savings)),",
+						"          normalized_job = trim(lower(replace(job, '/', '_'))),",
+						"          normalized_status = trim(lower(replace(replace(replace(marital_status, ' ', '_'), '/', '_or_'), '-', '_')))) ~> normalized",
+						"normalized derive(savings_little = iif(equals(normalized_savings, \"little\"), 1, 0),",
+						"          savings_moderate = iif(equals(normalized_savings, \"moderate\"), 1, 0),",
+						"          savings_high = iif(equals(normalized_savings, \"high\"), 1, 0),",
+						"          savings_very_high = iif(equals(normalized_savings, \"very high\"), 1, 0)) ~> savings",
+						"savings derive(male = iif(equals(sex, \"male\"), 1, 0)) ~> sex",
+						"sex derive(housing_own = iif(equals(housing, \"own\"), 1, 0),",
+						"          housing_rent = iif(equals(housing, \"rent\"), 1, 0)) ~> housing",
+						"housing derive(job_skilled_employee_official = iif(equals(normalized_job, \"skilled employee_official\"),      1,      0 ),",
+						"          job_unskilled = iif(     equals(normalized_job, \"unskilled\"),      1,      0 ),",
+						"          job_management_highly_skilled = iif(     equals(normalized_job, \"management_highly_skilled\"),      1,      0 )) ~> job",
+						"job derive(status_div_or_sep = iif(\r",
+						"    equals(normalized_status, \"divorced_or_separated\"), \r",
+						"    1, \r",
+						"    0\r",
+						")\r",
+						",",
+						"          status_div_sep_married = iif(     equals(normalized_status, \"divorced_or_separated_or_married\"),      1,      0 ),",
+						"          status_married_widowed = iif(     equals(normalized_status, \"married_or_widowed\"),      1,      0 )) ~> status",
+						"status sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> Out"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/GermanRisk')]",
+				"[concat(variables('factoryId'), '/datasets/GermanRiskOut')]"
+			]
+		}
+	]
+}
