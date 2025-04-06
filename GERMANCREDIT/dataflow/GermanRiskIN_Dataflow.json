@@ -30,7 +30,10 @@
 					"name": "housing"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "job"
+				},
+				{
+					"name": "normalizedjob"
 				}
 			],
 			"scriptLines": [
@@ -66,7 +69,10 @@
 				"savings derive(male = iif(equals(sex, \"male\"), 1, 0)) ~> sex",
 				"sex derive(housing_own = iif(equals(housing, \"own\"), 1, 0),",
 				"          housing_rent = iif(equals(housing, \"rent\"), 1, 0)) ~> housing",
-				"housing derive() ~> derivedColumn1"
+				"normalizedjob derive(job_skilled_employee_official = iif(equals(normalized_job, \"skilled employee_official\"),      1,      0 ),",
+				"          job_unskilled = iif(     equals(normalized_job, \"unskilled\"),      1,      0 ),",
+				"          job_management_highly_skilled = iif(     equals(normalized_job, \"management_highly_skilled\"),      1,      0 )) ~> job",
+				"housing derive(normalized_job = trim(lower(replace(job, '/', '_')))) ~> normalizedjob"
 			]
 		}
 	}
