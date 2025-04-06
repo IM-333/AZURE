@@ -22,6 +22,15 @@
 				},
 				{
 					"name": "savings"
+				},
+				{
+					"name": "sex"
+				},
+				{
+					"name": "housing"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -53,7 +62,11 @@
 				"normalized derive(savings_little = iif(equals(normalized_savings, \"little\"), 1, 0),",
 				"          savings_moderate = iif(equals(normalized_savings, \"moderate\"), 1, 0),",
 				"          savings_high = iif(equals(normalized_savings, \"high\"), 1, 0),",
-				"          savings_very_high = iif(equals(normalized_savings, \"very high\"), 1, 0)) ~> savings"
+				"          savings_very_high = iif(equals(normalized_savings, \"very high\"), 1, 0)) ~> savings",
+				"savings derive(male = iif(equals(sex, \"male\"), 1, 0)) ~> sex",
+				"sex derive(housing_own = iif(equals(housing, \"own\"), 1, 0),",
+				"          housing_rent = iif(equals(housing, \"rent\"), 1, 0)) ~> housing",
+				"housing derive() ~> derivedColumn1"
 			]
 		}
 	}
