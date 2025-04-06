@@ -12,7 +12,15 @@
 					"name": "DATAIN"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "GermanRiskOut",
+						"type": "DatasetReference"
+					},
+					"name": "Out"
+				}
+			],
 			"transformations": [
 				{
 					"name": "statusandrisk"
@@ -33,7 +41,7 @@
 					"name": "job"
 				},
 				{
-					"name": "normalizedjob"
+					"name": "status"
 				}
 			],
 			"scriptLines": [
@@ -61,7 +69,9 @@
 				"    1,\r",
 				"    0\r",
 				")) ~> statusandrisk",
-				"statusandrisk derive(normalized_savings = trim(lower(savings))) ~> normalized",
+				"statusandrisk derive(normalized_savings = trim(lower(savings)),",
+				"          normalized_job = trim(lower(replace(job, '/', '_'))),",
+				"          normalized_status = trim(lower(replace(replace(replace(marital_status, ' ', '_'), '/', '_or_'), '-', '_')))) ~> normalized",
 				"normalized derive(savings_little = iif(equals(normalized_savings, \"little\"), 1, 0),",
 				"          savings_moderate = iif(equals(normalized_savings, \"moderate\"), 1, 0),",
 				"          savings_high = iif(equals(normalized_savings, \"high\"), 1, 0),",
@@ -69,10 +79,27 @@
 				"savings derive(male = iif(equals(sex, \"male\"), 1, 0)) ~> sex",
 				"sex derive(housing_own = iif(equals(housing, \"own\"), 1, 0),",
 				"          housing_rent = iif(equals(housing, \"rent\"), 1, 0)) ~> housing",
-				"normalizedjob derive(job_skilled_employee_official = iif(equals(normalized_job, \"skilled employee_official\"),      1,      0 ),",
+				"housing derive(job_skilled_employee_official = iif(equals(normalized_job, \"skilled employee_official\"),      1,      0 ),",
 				"          job_unskilled = iif(     equals(normalized_job, \"unskilled\"),      1,      0 ),",
 				"          job_management_highly_skilled = iif(     equals(normalized_job, \"management_highly_skilled\"),      1,      0 )) ~> job",
-				"housing derive(normalized_job = trim(lower(replace(job, '/', '_')))) ~> normalizedjob"
+				"job derive(status_div_or_sep = iif(\r",
+				"    equals(normalized_status, \"divorced_or_separated\"), \r",
+				"    1, \r",
+				"    0\r",
+				")\r",
+				",",
+				"          status_div_sep_married = iif(     equals(normalized_status, \"divorced_or_separated_or_married\"),      1,      0 ),",
+				"          status_married_widowed = iif(     equals(normalized_status, \"married_or_widowed\"),      1,      0 )) ~> status",
+				"status sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> Out"
 			]
 		}
 	}
