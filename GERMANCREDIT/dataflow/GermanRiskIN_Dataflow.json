@@ -13,7 +13,17 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "statusandrisk"
+				},
+				{
+					"name": "normalized"
+				},
+				{
+					"name": "savings"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          existingchecking as string,",
@@ -31,7 +41,19 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> DATAIN"
+				"     ignoreNoFilesFound: false) ~> DATAIN",
+				"DATAIN derive(marital_status = split(status_sex, ':')[1],",
+				"          sex = split(status_sex, ':')[2],",
+				"          risk = iif(\r",
+				"    equals(lower(trim(risk)), \"high risk\"),\r",
+				"    1,\r",
+				"    0\r",
+				")) ~> statusandrisk",
+				"statusandrisk derive(normalized_savings = trim(lower(savings))) ~> normalized",
+				"normalized derive(savings_little = iif(equals(normalized_savings, \"little\"), 1, 0),",
+				"          savings_moderate = iif(equals(normalized_savings, \"moderate\"), 1, 0),",
+				"          savings_high = iif(equals(normalized_savings, \"high\"), 1, 0),",
+				"          savings_very_high = iif(equals(normalized_savings, \"very high\"), 1, 0)) ~> savings"
 			]
 		}
 	}
