@@ -1,0 +1,9 @@
+{
+	"name": "GermanCreditADF",
+	"location": "brazilsouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "e8d9671b-fbc4-41e2-b8c5-16c55c149708",
+		"tenantId": "e994072b-523e-4bfe-86e2-442c5e10b244"
+	}
+}
